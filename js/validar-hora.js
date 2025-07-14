@@ -1,318 +1,84 @@
-$(function() {
-    
-    /*
-    //SOLO FUNCIONA CON UN SELECT
-    $('.hora_reserva').change(function (e) { 
-        
-        e.preventDefault();
-        var hora_reserva = $('.hora_reserva').val();
-        var fecha_reserva = $('.fecha_reserva').val();
+$(function () {
+    "use strict";
 
-        //console.log(hora_reserva);
-        //console.log(fecha_reserva);
-        
-        if(fecha_reserva == ""){
-            //console.log('se necesita una fecha');
-        }else{
+    const validarHoraAjax = (hora, fecha) => {
+        $.post("custom/consultas.php?opc=validar_hora_ajax", {
+            hora_reserva: hora,
+            dates: fecha
+        }, function (response) {
+            const mensaje = JSON.parse(response);
+            $('.error-mensaje').text(mensaje);
+        });
+    };
 
-            $.ajax({
-                type: "post",
-                url: "custom/consultas.php?opc=validar_hora_ajax",
-                data: {
-                    hora_reserva : hora_reserva,
-                    dates : fecha_reserva
-                },
-                success: function (error) {
+    const bloquearHorasOcupadas = (fecha) => {
+        $.post("custom/consultas.php?opc=validar_hora_ajax2", { fecha }, function (response) {
+            const obj = JSON.parse(response);
 
-                    var pars = JSON.parse(error)
+            // Primero resetear todos los botones
+            $('button.tabla').prop('disabled', false).css('backgroundColor', '#28a745');
 
-                    $('.error-mensaje').text(pars);
-                }
-            });
-        }
-*/
-
-});
-
-
-
-
-$('input[name="dates"]').on('show.daterangepicker', function (ev, picker) {
-
-
-        var fecha = $('.fecha-reserva').val();	   
-        //console.log(fecha);
-        //console.log("set");
-    
-        //$.get( "/horarios-disponibles.php?fecha="+fecha, function( data ) {
-            //$( ".horarios-response" ).html( data );		
-        //}); 
-   
-        var hora_reserva = $('.hora_reserva').val();
-        var fecha_reserva = $('.fecha_reserva').val();
-              
-        
-        if(fecha_reserva == ""){
-            ////console.log('se necesita una fecha');
-        }else{
-        
-            $.ajax({
-                type: "post",
-                url: "custom/consultas.php?opc=validar_hora_ajax",
-                data: {
-                    hora_reserva : hora_reserva,
-                    dates : fecha_reserva
-                },
-                success: function (error) {
-        
-                    var pars = JSON.parse(error)
-        
-                    $('.error-mensaje').text(pars);
-                }
-            });
-        }
-});
-
-
-$('input[name="dates"]').on('hide.daterangepicker', function (ev, picker) {
-
-
-    var fecha = $('.fecha-reserva').val();	
-    //console.log("set2");
-        //console.log(fecha);
-
-        
-    var hora_reserva = $('.hora_reserva').val(fecha);
-    var fecha_reserva = $('.fecha_reserva').val();
-    
-    setTimeout(function () {  
-       //console.log('funcion ejecutada');
-        
-
-       $.ajax({
-        type: "post",
-        url: "custom/consultas.php?opc=validar_hora_ajax2",
-        data: {
-            fecha : $('.fecha_reserva').val(),
-        },
-        success: function (response) {
-            
-            //console.log('entra al ajax 1');
-            //console.log(response);
-            var obj = JSON.parse(response);
-
-            
-                    if(obj.length == 0){
-
-                        //console.log('estan disponibles todas las plazas');
-                        $('button.tabla').removeAttr('disabled');
-                        $('button.tabla').css('backgroundColor' , '#28a745');
-                                        
-                    }else{
-
-                        
-                        
-                        $('button.tabla').removeAttr('disabled');
-                        $('button.tabla').css('backgroundColor' , '#28a745'); 
-
-                        for(var i = 0; i <= obj.length - 1; i++){
-                                                
-                                $("button[table-data='"+obj[i]["hora"]+"']").css('backgroundColor', 'red');   
-                                $("button[table-data='"+obj[i]["hora"]+"']").attr('disabled' , 'disabled');
-                                $("button[table-data='"+obj[i]["hora2"]+"']").css('backgroundColor', 'red');   
-                                $("button[table-data='"+obj[i]["hora2"]+"']").attr('disabled' , 'disabled');
-                                $("button[table-data='"+obj[i]["hora3"]+"']").css('backgroundColor', 'red');   
-                                $("button[table-data='"+obj[i]["hora3"]+"']").attr('disabled' , 'disabled');
-                                $("button[table-data='"+obj[i]["hora4"]+"']").css('backgroundColor', 'red');   
-                                $("button[table-data='"+obj[i]["hora4"]+"']").attr('disabled' , 'disabled');                                 
-                       }
+            if (obj.length > 0) {
+                obj.forEach(item => {
+                    ["hora", "hora2", "hora3", "hora4"].forEach(h => {
+                        const hora = item[h];
+                        if (hora) {
+                            $(`button[table-data="${hora}"]`).css('backgroundColor', 'red').attr('disabled', true);
                         }
+                    });
+                });
             }
         });
+    };
 
+    // Al seleccionar fecha
+    $('input[name="dates"]').on('hide.daterangepicker', function () {
+        const fecha = $('.fecha_reserva').val();
+        bloquearHorasOcupadas(fecha);
 
+        const hora = $('.hora_reserva').val();
+        if (fecha) validarHoraAjax(hora, fecha);
+    });
 
+    // Al abrir el calendario
+    $('input[name="dates"]').on('show.daterangepicker', function () {
+        const fecha = $('.fecha_reserva').val();
+        const hora = $('.hora_reserva').val();
 
+        if (fecha) validarHoraAjax(hora, fecha);
+    });
 
-        $('.tabla').click(function (e) { 
-           
-            
-            e.preventDefault();
+    // Al esconder el calendario (evento propio del plugin)
+    $('input[name="dates"]').on('hideCalendar.daterangepicker', function () {
+        const fecha = $('.fecha_reserva').val();
+        const hora = $('.hora_reserva').val();
+        if (fecha) validarHoraAjax(hora, fecha);
+    });
 
-            var fecha_reserva = $('.fecha_reserva').val();
-            var valTabla = $(this).attr('table-data');
+    // Al mostrar calendario completo
+    $('input[name="dates"]').on('showCalendar.daterangepicker', function () {
+        const fecha = $('.fecha_reserva').val();
 
-            $('.hora_reserva').val(valTabla);
-
-            $.ajax({
-                type: "post",
-                url: "custom/consultas.php?opc=validar_hora_ajax2",
-                data: {
-                    fecha : fecha_reserva,
-                    hora : valTabla
-                    },
-                success: function (response) {
-                    
-
-                    var obj = JSON.parse(response);
-
-                    
-                            if(obj.length == 0){
-
-                                //console.log('estan disponibles todas las plazas');
-                                $('button.tabla').removeAttr('disabled');
-                                $('button.tabla').css('backgroundColor' , '#28a745');
-                                                
-                            }else{
-
-                                
-                                
-                                $('button.tabla').removeAttr('disabled');
-                                $('button.tabla').css('backgroundColor' , '#28a745'); 
-
-                                for(var i = 0; i <= obj.length - 1; i++){
-                                                        
-                                        $("button[table-data='"+obj[i]["hora"]+"']").css('backgroundColor', 'red');   
-                                        $("button[table-data='"+obj[i]["hora"]+"']").attr('disabled' , 'disabled');
-                                        $("button[table-data='"+obj[i]["hora2"]+"']").css('backgroundColor', 'red');   
-                                        $("button[table-data='"+obj[i]["hora2"]+"']").attr('disabled' , 'disabled');
-                                        $("button[table-data='"+obj[i]["hora3"]+"']").css('backgroundColor', 'red');   
-                                        $("button[table-data='"+obj[i]["hora3"]+"']").attr('disabled' , 'disabled');
-                                        $("button[table-data='"+obj[i]["hora4"]+"']").css('backgroundColor', 'red');   
-                                        $("button[table-data='"+obj[i]["hora4"]+"']").attr('disabled' , 'disabled');                                                                                
-                               }
-                            }
-                }
+        if (fecha) {
+            $.get(`horarios-disponibles.php?fecha=${fecha}`, function (data) {
+                $(".horarios-response").html(data);
             });
-            $('.servicio_reserva_test').trigger('change');
 
+            const hora = $('.hora_reserva').val();
+            validarHoraAjax(hora, fecha);
+        }
+    });
 
-        });
+    // Clic sobre botón de horario
+    $(document).on('click', '.tabla', function (e) {
+        e.preventDefault();
+        const hora = $(this).attr('table-data');
+        const fecha = $('.fecha_reserva').val();
 
+        $('.hora_reserva').val(hora);
 
+        bloquearHorasOcupadas(fecha);
 
-
-
-
-    },500)
-
-    
-    if(fecha_reserva == ""){
-        ////console.log('se necesita una fecha');
-    }else{
-    
-        $.ajax({
-            type: "post",
-            url: "custom/consultas.php?opc=validar_hora_ajax",
-            data: {
-                hora_reserva : hora_reserva,
-                dates : fecha_reserva
-            },
-            success: function (error) {
-    
-                var pars = JSON.parse(error)
-    
-                $('.error-mensaje').text(pars);
-            }
-        });
-    }
+        $('.servicio_reserva_test').trigger('change');
+    });
 });
-
-
-
-
-$('input[name="dates"]').on('hideCalendar.daterangepicker', function (ev, picker) {
-
-
-
-    var fecha = $('.fecha-reserva').val();	
-    
-        //console.log(fecha);
-
-
-        
-    var hora_reserva = $('.hora_reserva').val();
-    var fecha_reserva = $('.fecha_reserva').val();
-    
-
-    
-    if(fecha_reserva == ""){
-        //console.log('se necesita una fecha');
-    }else{
-    
-        $.ajax({
-            type: "post",
-            url: "custom/consultas.php?opc=validar_hora_ajax",
-            data: {
-                hora_reserva : hora_reserva,
-                dates : fecha_reserva
-            },
-            success: function (error) {
-    
-                var pars = JSON.parse(error)
-    
-                $('.error-mensaje').text(pars);
-            }
-        });
-    }
-});
-
-
-
-
-$('input[name="dates"]').on('showCalendar.daterangepicker', function (ev, picker) {
-
-
-
-    var fecha = $('.fecha_reserva').val();	
-    //console.log(fecha);
-        
-   
-        $.get( "horarios-disponibles.php?fecha="+fecha, function( data ) {
-            $( ".horarios-response" ).html( data );		
-        }); 
-
-
-
-
-    var hora_reserva = $('.hora_reserva').val();
-    var fecha_reserva = $('.fecha_reserva').val();
-    
-
-    
-    if(fecha_reserva == ""){
-        ////console.log('se necesita una fecha');
-    }else{
-    
-        $.ajax({
-            type: "post",
-            url: "custom/consultas.php?opc=validar_hora_ajax",
-            data: {
-                hora_reserva : hora_reserva,
-                dates : fecha_reserva
-            },
-            success: function (error) {
-    
-                var pars = JSON.parse(error)
-    
-                $('.error-mensaje').text(pars);
-            }
-        });
-    }
-});
-
-
-
-
-    
-         
-    
-
-
-        
- 
-
-
-
-
-

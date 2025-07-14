@@ -1,176 +1,104 @@
-<?php 
-
-
+<?php
 
 require_once "../administration/config/conexion.php";
 
+header('Content-Type: application/json; charset=utf-8');
 
+$opc = $_GET['opc'] ?? null;
 
-$opc = $_GET['opc'];
+switch ($opc) {
+    case 'check_email':
+        $email = $_POST['email_cliente'] ?? null;
 
+        if (!$email) exit(json_encode(['error' => 'Email requerido.']));
 
+        $stmt = $conect->prepare("SELECT pass_cliente FROM clientes WHERE email_cliente = :email");
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        echo json_encode($data ? $data['pass_cliente'] : null);
+        break;
 
+    case 'login':
+        $email = $_POST['email_cliente'] ?? null;
 
-if($opc == 'check_email'){
+        if (!$email) exit(json_encode(['error' => 'Email requerido.']));
 
-    
+        $stmt = $conect->prepare("SELECT id_cliente FROM clientes WHERE email_cliente = :email");
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $email_cliente = $_POST['email_cliente'];        
+        echo json_encode($data ? $data['id_cliente'] : null);
+        break;
 
-    
+    case 'borrar_reserva':
+        $id = $_POST['id_reserva'] ?? null;
 
-    $detalles_email =$conect->prepare("SELECT * FROM clientes WHERE email_cliente=:email_cliente");
+        if ($id) {
+            $stmt = $conect->prepare("DELETE FROM reservas WHERE id_reserva = :id");
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['error' => 'ID requerido']);
+        }
+        break;
 
-    $detalles_email->bindParam(':email_cliente',$email_cliente);
+    case 'set_pass':
+        $email = $_POST['email_cliente'] ?? null;
+        $pass = $_POST['pass_cliente'] ?? null;
 
-    $detalles_email->execute();
+        if (!$email || !$pass) exit(json_encode(['error' => 'Datos incompletos.']));
 
-    
+        $stmt = $conect->prepare("UPDATE clientes SET pass_cliente = :pass WHERE email_cliente = :email");
+        $stmt->bindParam(':pass', $pass);
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
 
-    $data = $detalles_email->Fetch(PDO::FETCH_ASSOC);
+        echo json_encode(['success' => true]);
+        break;
 
-    $datos = $data['pass_cliente'];
+    case 'edit_reserva_cliente_detalles':
+        $id = $_POST['id_reserva'] ?? null;
 
-    
+        if (!$id) exit(json_encode(['error' => 'ID requerido.']));
 
-    echo json_encode($datos);    
+        $stmt = $conect->prepare("SELECT * FROM reservas INNER JOIN servicios ON reservas.title = servicios.id_servicio WHERE id_reserva = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        echo json_encode($data ?: []);
+        break;
+
+    case 'edit_reserva_cliente':
+        $id = $_POST['id_reserva'] ?? null;
+        $title = $_POST['title'] ?? null;
+        $fecha = $_POST['fecha'] ?? null;
+        $hora = $_POST['hora'] ?? null;
+        $start = $_POST['start'] ?? null;
+        $end = $_POST['end'] ?? null;
+
+        if (!$id || !$title || !$fecha || !$hora || !$start || !$end) {
+            exit(json_encode(['error' => 'Datos incompletos']));
+        }
+
+        $stmt = $conect->prepare("UPDATE reservas SET title = :title, hora = :hora, fecha = :fecha, start = :start, end = :end WHERE id_reserva = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':title', $title);
+        $stmt->bindParam(':hora', $hora);
+        $stmt->bindParam(':fecha', $fecha);
+        $stmt->bindParam(':start', $start);
+        $stmt->bindParam(':end', $end);
+        $stmt->execute();
+
+        echo json_encode(['success' => true]);
+        break;
+
+    default:
+        http_response_code(400);
+        echo json_encode(['error' => 'Parámetro inválido']);
+        break;
 }
-
-
-
-
-
-
-
-elseif($opc == 'login' ){
-
-    $email_cliente = $_POST['email_cliente'];        
-
-    //$pass_cliente = $_POST['pass_cliente'];        
-
-
-
-    $ver_reservas_frontend =$conect->prepare("SELECT * FROM clientes WHERE email_cliente=:email_cliente");
-
-    $ver_reservas_frontend->bindParam(':email_cliente',$email_cliente);
-
-    //$ver_reservas_frontend->bindParam(':pass_cliente',$pass_cliente);
-
-    $ver_reservas_frontend->execute();
-
-    
-
-    $data = $ver_reservas_frontend->Fetch(PDO::FETCH_ASSOC);
-
-    $respuesta = $data['id_cliente'];
-
-    
-
-    echo json_encode($respuesta); 
-
-
-
-}
-
-
-
-
-
-elseif($opc == 'borrar_reserva'){
-
-
-
-    $id_reserva = $_POST['id_reserva'];
-
-
-
-
-
-    $borrar_reserva =$conect->prepare("DELETE  FROM reservas WHERE id_reserva = :id_reserva ");
-
-    $borrar_reserva->bindParam(':id_reserva',$id_reserva);
-
-    $borrar_reserva->execute();
-
-}
-
-
-
-
-
-elseif($opc == 'set_pass'){
-
-
-
-    $email_cliente = $_POST['email_cliente'];        
-
-    $pass_cliente = $_POST['pass_cliente']; 
-
-
-
-    $sql = "UPDATE clientes SET pass_cliente=:pass_cliente WHERE email_cliente=:email_cliente";
-
-    $actualizar = $conect->prepare($sql);
-
-    $actualizar->bindParam(':pass_cliente',$pass_cliente);
-
-    $actualizar->bindParam(':email_cliente',$email_cliente);
-
-    $actualizar->execute();
-
-
-
-}
-
-
-
-
-
-elseif($opc == 'edit_reserva_cliente_detalles'){
-
-    $id_reserva = $_POST['id_reserva'];        
-
-    $sql = "SELECT * FROM reservas INNER JOIN servicios ON reservas.title = servicios.id_servicio WHERE id_reserva = :id_reserva;
-    ";
-
-    $actualizar_reserva = $conect->prepare($sql);
-    $actualizar_reserva->bindParam(':id_reserva',$id_reserva);
-    $actualizar_reserva->execute();
-    $datos = $actualizar_reserva->Fetch(PDO::FETCH_ASSOC);
-
-    echo json_encode($datos);  
-
-
-
-}
-
-
-elseif($opc == "edit_reserva_cliente"){
-
-    $id_reserva = $_POST["id_reserva"];
-    $title = $_POST['title'];
-    $fecha = $_POST['fecha'];
-    $hora = $_POST['hora'];
-    $start = $_POST['start'];
-    $end = $_POST['end'];
-
-    $sql = "UPDATE reservas SET title = :title, hora = :hora, fecha = :fecha, start = :start, end = :end WHERE id_reserva = :id_reserva";
-    $datos_actualizar = $conect->prepare($sql);
-    $datos_actualizar->bindParam(':id_reserva', $id_reserva);
-    $datos_actualizar->bindParam(':title', $title);
-    $datos_actualizar->bindParam(':hora', $hora);
-    $datos_actualizar->bindParam(':fecha', $fecha);
-    $datos_actualizar->bindParam(':start', $start);
-    $datos_actualizar->bindParam(':end', $end);
-    $datos_actualizar->execute();
-    
-
-
-
-
-}
-
-
-?>

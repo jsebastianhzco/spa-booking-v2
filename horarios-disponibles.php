@@ -1,423 +1,58 @@
 <?php
 
-
-
-$fecha = $_GET['fecha'];
-
-date("y-m-d-l", strtotime( $fecha));
-
-
-
-$day = date("l", strtotime( $fecha));
-
-$custom_date = date("j-n-Y");   
-echo $custom_date;
-
-
-if($day == "Monday"){
-
-    $data = "
-
-    <tr>
-
-        <td class='pd-5' ><button type='button' table-data='09:00' class='tabla btn btn-success'>09:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='09:30' class='tabla btn btn-success'>09:30</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='10:00' class='tabla btn btn-success'>10:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='10:30' class='tabla btn btn-success'>10:30</button></td>    
-
-        </tr>
-
-    
-
-    
-
-        <tr>
-
-        <td class='pd-5' ><button type='button' table-data='11:00' class='tabla btn btn-success'>11:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='11:30' class='tabla btn btn-success'>11:30</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='13:00' class='tabla btn btn-success'>13:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='13:30' class='tabla btn btn-success'>13:30</button></td>
-
-        </tr>
-
-    
-
-    
-
-        <tr>    
-
-        
-
-        <td class='pd-5' ><button type='button' table-data='14:00' class='tabla btn btn-success'>14:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='14:30' class='tabla btn btn-success'>14:30</button></td> 
-
-        <td class='pd-5' ><button type='button' table-data='15:00' class='tabla btn btn-success'>15:00</button></td> 
-
-        <td class='pd-5' ><button type='button' table-data='15:30' class='tabla btn btn-success'>15:30</button></td>
-
-    
-
-        </tr>
-
-    
-
-       <tr>
-
- 
-
-        <td class='pd-5' ><button type='button' table-data='16:00' class='tabla btn btn-success'>16:00</button></td>       
-
-        <td class='pd-5' ><button type='button' table-data='16:30' class='tabla btn btn-success'>16:30</button></td>       
-
-
-        <td class='pd-5' ><button type='button' table-data='17:00' class='tabla btn btn-success'>17:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='17:30' class='tabla btn btn-success'>17:30</button></td>
-
- 
-
-        </tr>
-
-        ";
-
-    
-
-    
-
-    
-
-        echo $data;
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-elseif ($day == "Tuesday"){
-
-    $data = "
-
-    <tr>
-
-        <td class='pd-5' ><button type='button' table-data='09:00' class='tabla btn btn-success'>09:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='09:30' class='tabla btn btn-success'>09:30</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='10:00' class='tabla btn btn-success'>10:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='10:30' class='tabla btn btn-success'>10:30</button></td>    
-
-        </tr>
-
-    
-
-    
-
-        <tr>
-
-        <td class='pd-5' ><button type='button' table-data='11:00' class='tabla btn btn-success'>11:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='11:30' class='tabla btn btn-success'>11:30</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='13:00' class='tabla btn btn-success'>13:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='13:30' class='tabla btn btn-success'>13:30</button></td>
-
-        </tr>
-
-    
-
-    
-
-        <tr>    
-
-        
-
-        <td class='pd-5' ><button type='button' table-data='14:00' class='tabla btn btn-success'>14:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='14:30' class='tabla btn btn-success'>14:30</button></td> 
-
-        <td class='pd-5' ><button type='button' table-data='15:00' class='tabla btn btn-success'>15:00</button></td> 
-
-        <td class='pd-5' ><button type='button' table-data='15:30' class='tabla btn btn-success'>15:30</button></td>
-
-    
-
-        </tr>
-
-
-
-        ";
-
-    
-
-    
-
-    
-
-        echo $data;
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-elseif($day == "Wednesday"){
-
-    $data = "
-
-    <tr>
-
-        <td class='pd-5' ><button type='button' table-data='09:00' class='tabla btn btn-success'>09:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='09:30' class='tabla btn btn-success'>09:30</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='10:00' class='tabla btn btn-success'>10:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='10:30' class='tabla btn btn-success'>10:30</button></td>    
-
-        </tr>
-
-    
-
-    
-
-        <tr>
-
-        <td class='pd-5' ><button type='button' table-data='11:00' class='tabla btn btn-success'>11:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='11:30' class='tabla btn btn-success'>11:30</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='13:00' class='tabla btn btn-success'>13:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='13:30' class='tabla btn btn-success'>13:30</button></td>
-
-        </tr>
-
-    
-
-    
-
-        <tr>    
-
-        
-
-        <td class='pd-5' ><button type='button' table-data='14:00' class='tabla btn btn-success'>14:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='14:30' class='tabla btn btn-success'>14:30</button></td> 
-
-        <td class='pd-5' ><button type='button' table-data='15:00' class='tabla btn btn-success'>15:00</button></td> 
-
-        <td class='pd-5' ><button type='button' table-data='15:30' class='tabla btn btn-success'>15:30</button></td>
-
-    
-
-        </tr>
-
-    
-
-       <tr>
-
- 
-
-        <td class='pd-5' ><button type='button' table-data='16:00' class='tabla btn btn-success'>16:00</button></td>       
-
-        <td class='pd-5' ><button type='button' table-data='16:30' class='tabla btn btn-success'>16:30</button></td>       
-
-
-        <td class='pd-5' ><button type='button' table-data='17:00' class='tabla btn btn-success'>17:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='17:30' class='tabla btn btn-success'>17:30</button></td>
-
-
-
-        </tr>
-
-        ";
-
-    
-
-    
-
-    
-
-        echo $data;
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-elseif($day == "Thursday"){
-
-    $data = "
-
-    <tr>
-
-        <td class='pd-5' ><button type='button' table-data='09:00' class='tabla btn btn-success'>09:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='09:30' class='tabla btn btn-success'>09:30</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='10:00' class='tabla btn btn-success'>10:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='10:30' class='tabla btn btn-success'>10:30</button></td>    
-
-    </tr>
-
-    
-
-    
-
-        <tr>
-
-        <td class='pd-5' ><button type='button' table-data='11:00' class='tabla btn btn-success'>11:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='11:30' class='tabla btn btn-success'>11:30</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='13:00' class='tabla btn btn-success'>13:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='13:30' class='tabla btn btn-success'>13:30</button></td>
-
-        </tr>
-
-    
-
-    
-
-        <tr>    
-
-        
-
-        <td class='pd-5' ><button type='button' table-data='14:00' class='tabla btn btn-success'>14:00</button></td>
-
-        <td class='pd-5' ><button type='button' table-data='14:30' class='tabla btn btn-success'>14:30</button></td> 
-
-        <td class='pd-5' ><button type='button' table-data='15:00' class='tabla btn btn-success'>15:00</button></td> 
-
-        <td class='pd-5' ><button type='button' table-data='15:30' class='tabla btn btn-success'>15:30</button></td>
-
-    
-
-        </tr>
-
-    
-
-
-
-        ";
-
-    
-
-    
-
-    
-
-        echo $data;
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-elseif($day == "Friday"){
-
-
-                $data = "
-
-                <tr>
-
-                <td class='pd-5' ><button type='button' table-data='09:00' class='tabla btn btn-success'>09:00</button></td>
-        
-                <td class='pd-5' ><button type='button' table-data='09:30' class='tabla btn btn-success'>09:30</button></td>
-        
-                <td class='pd-5' ><button type='button' table-data='10:00' class='tabla btn btn-success'>10:00</button></td>
-        
-                <td class='pd-5' ><button type='button' table-data='10:30' class='tabla btn btn-success'>10:30</button></td>    
-        
-            </tr>
-
-            <tr>
-
-            <td class='pd-5' ><button type='button' table-data='11:00' class='tabla btn btn-success'>11:00</button></td>
-    
-            <td class='pd-5' ><button type='button' table-data='11:30' class='tabla btn btn-success'>11:30</button></td>
-    
-
-    
-            </tr>
-                ";
-
-                echo $data;
+class Schedule
+{
+    private string $fecha;
+    private string $day;
+    private array $horariosDisponibles = [
+        "Monday" => ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30"],
+        "Tuesday" => ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30"],
+        "Wednesday" => ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30"],
+        "Thursday" => ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30"],
+        "Friday" => ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30"]
+    ];
+
+    public function __construct(string $fecha)
+    {
+        $this->fecha = $fecha;
+        $this->day = date("l", strtotime($fecha));
+    }
+
+    public function render(): string
+    {
+        if (!isset($this->horariosDisponibles[$this->day])) {
+            return '';
+        }
+
+        $output = '';
+        $count = 0;
+
+        foreach ($this->horariosDisponibles[$this->day] as $hora) {
+            if ($count % 4 === 0) {
+                $output .= '<tr>';
             }
 
+            $output .= "<td class='pd-5'><button type='button' table-data='{$hora}' class='tabla btn btn-success'>{$hora}</button></td>";
 
+            $count++;
+
+            if ($count % 4 === 0) {
+                $output .= '</tr>';
+            }
+        }
+
+        if ($count % 4 !== 0) {
+            $output .= '</tr>';
+        }
+
+        return $output;
+    }
+}
+
+// Uso:
+$fecha = $_GET['fecha'] ?? '';
+if ($fecha) {
+    $schedule = new Schedule($fecha);
+    echo $schedule->render();
+}
 ?>

@@ -1,12 +1,10 @@
 <?php
-
 $required = "required";
-$site_author ="fait avec ❤️ par Vista Web";
-$site_title = "Acupuncture | Elianne Bouchard" ;
-$current_year;
+$site_author = "fait avec ❤️ par Vista Web";
+$site_title = "Acupuncture | Elianne Bouchard";
+$current_year = date("Y");
 
-include './administration/config/conexion.php';
-
+require_once "./administration/config/conexion.php";
 ?>
 
 
@@ -69,74 +67,94 @@ include './administration/config/conexion.php';
 	</nav>
 	<!-- /menu -->
 	
-	<div class="container-fluid full-height">
-		<div class="row row-height">
+<div class="container-fluid full-height">
+    <div class="row row-height">
+        <div class="col-lg-8 content-right">
+            <div>
+                <?php
+$required = "required";
+$site_author = "fait avec ❤️ par Vista Web";
+$site_title = "Acupuncture | Elianne Bouchard";
+$current_year = date("Y");
 
+require_once "./administration/config/conexion.php";
+?>
 
-			<div class="col-lg-8 content-right">
-				<div>
-				
-							<?php
-							error_reporting(0);
+<!-- HTML igual que ya tenías hasta la parte donde empieza el contenido dinámico -->
 
+<div class="container-fluid full-height">
+    <div class="row row-height">
+        <div class="col-lg-8 content-right">
+            <div>
+                <?php
+                if (isset($_GET["id_cliente"])) {
+                    $id_cliente = intval($_GET["id_cliente"]);
 
-							$id_cliente = $_GET['id_cliente'];
+                    echo '<a href="/mon-compte.php">
+                            <input type="button" value="Déconnexion" class="btn btn-primary">
+                          </a><br><br>';
 
-							if(isset($id_cliente)){
-					
-							 ?>
-							<a href="/mon-compte.php"> <input type="button" value="Logout" class="btn btn-primary"></a>
-							 <br><br>
-                    <table class="table info-booking">
-                        <thead>
-                          <tr>
-                            <th scope="col">Id</th>
-                            
-                            <th scope="col">Date</th>
-							<th scope="col">Heure</th>
-							<th scope="col">Service</th>
-                            <th scope="col">CANCEL</th>
-                          </tr>
-                        </thead>
-                        <tbody>
+                    $stmt = $conect->prepare("
+                        SELECT 
+                            re.id_reserva, 
+                            re.fecha, 
+                            re.hora, 
+                            ser.nombre_servicio
+                        FROM reservas AS re
+                        INNER JOIN servicios AS ser ON ser.id_servicio = re.title
+                        WHERE re.id_cliente = :id_cliente
+                        ORDER BY re.fecha DESC
+                    ");
+                    $stmt->bindParam(":id_cliente", $id_cliente, PDO::PARAM_INT);
+                    $stmt->execute();
+                    $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-							
-							<?php
-							$vista = $conect->prepare("SELECT re.id_reserva ,re.fecha, re.id_cliente, re.hora , re.title , ser.nombre_servicio
-							FROM reservas as re
-                            INNER JOIN servicios AS ser ON ser.id_servicio = re.title 
-							
-							WHERE re.id_cliente = :id_cliente");
-							$vista->bindParam(':id_cliente',$id_cliente);
-							
-							$vista->execute();
-							$vista->setFetchMode(PDO::FETCH_ASSOC);
-				
-							while ($data=$vista->fetch(PDO::FETCH_ORI_NEXT)) {
-								
-							?>
-
-
-                          <tr>
-
-                            <td><?php echo $data['id_reserva']; ?></td>
- 
-                            <td><?php echo $data['fecha']; ?></td>
-                            <td><?php echo $data['hora']; ?></td>
-							<td><?php echo $data['nombre_servicio']; ?></td>
-							<td><input  type="button" value="Cancel" class="btn btn-danger" id="<?php echo $data['id_reserva']; ?>"></td>
-                          </tr>
-
-<?php } 
-} ?>
-
-                        </tbody>
+                    if ($reservas): ?>
+                        <table class="table info-booking">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Heure</th>
+                                    <th scope="col">Service</th>
+                                    <th scope="col">Annuler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($reservas as $reserva): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($reserva["id_reserva"]) ?></td>
+                                        <td><?= htmlspecialchars($reserva["fecha"]) ?></td>
+                                        <td><?= htmlspecialchars($reserva["hora"]) ?></td>
+                                        <td><?= htmlspecialchars($reserva["nombre_servicio"]) ?></td>
+                                        <td>
+                                            <input type="button" value="Annuler" class="btn btn-danger" id="<?= htmlspecialchars($reserva["id_reserva"]) ?>">
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
                         </table>
-					</div>
+                <?php else:
+                        echo "<p>Aucune réservation trouvée.</p>";
+                    endif;
+                } else {
+                    echo "<p>Identifiant client manquant.</p>";
+                }
+                ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /container-fluid -->
 					<!-- /Wizard container -->
 				
 					<div class="footer">
-						<em>2020 <?php echo $site_title ?> - fait avec ❤️ par Vista Web</em>
+						<em>2020 <?php echo $site_title; ?> - fait avec ❤️ par Vista Web</em>
 					</div>
 					<!-- Footer -->
 			</div>

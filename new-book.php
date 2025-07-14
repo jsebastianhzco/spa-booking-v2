@@ -1,72 +1,88 @@
-<?php require_once "administration/config/conexion.php";?>
-<!DOCTYPE html>
-<html lang="fr">
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Réservations | Acupuncture | Elianne Bouchard">
-    <meta name="author" content="Vista Web">
-    <title>Réservations &#8211; Acupuncture | Elianne Bouchard</title>
-
-    <!-- Favicons-->
-    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" type="image/x-icon" href="img/apple-touch-icon-57x57-precomposed.png">
-    <link rel="apple-touch-icon" type="image/x-icon" sizes="72x72" href="img/apple-touch-icon-72x72-precomposed.png">
-    <link rel="apple-touch-icon" type="image/x-icon" sizes="114x114" href="img/apple-touch-icon-114x114-precomposed.png">
-    <link rel="apple-touch-icon" type="image/x-icon" sizes="144x144" href="img/apple-touch-icon-144x144-precomposed.png">
-
-    <!-- GOOGLE WEB FONT -->
-    <link href="https://fonts.googleapis.com/css?family=Work+Sans:300,400,500,600" rel="stylesheet">
-
-    <!-- BASE CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-	<link href="css/vendors.css" rel="stylesheet">
-
-    <!-- YOUR CUSTOM CSS -->
-    <link href="css/custom.css" rel="stylesheet">
-    
-	<script type="text/javascript">
-    function delayedRedirect(){
-        window.location = "/"
-    }
-    </script>
-
-</head>
-<body onLoad="etTimeout('delayedRedirect()', 5000)" style="background-color:#fff;">
-
 <?php
+require_once "administration/config/conexion.php";
+
+header('Content-Type: text/html; charset=utf-8');
+
+// Función de limpieza
+function sanitize_input($data) {
+    return htmlspecialchars(stripslashes(trim($data)), ENT_QUOTES, 'UTF-8');
+}
+
+// Variables saneadas
+$usuario_cliente = "DEFAULT";
+$pass_cliente = "DEFAULT"; // Reemplazar en producción con password_hash()
+
+$nombre_cliente = isset($_POST['nombre_cliente']) ? sanitize_input($_POST['nombre_cliente']) : '';
+$apellido_cliente = isset($_POST['apellido_cliente']) ? sanitize_input($_POST['apellido_cliente']) : '';
+$email_cliente = isset($_POST['email_cliente']) ? sanitize_input($_POST['email_cliente']) : '';
+$tel_cliente = isset($_POST['tel_cliente']) ? sanitize_input($_POST['tel_cliente']) : '';
+
+// Validación de campos vacíos
+if (empty($nombre_cliente) || empty($apellido_cliente) || empty($email_cliente) || empty($tel_cliente)) {
+    echo <<<HTML
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Erreur</title></head>
+<body style="background-color:#fff; text-align:center; padding-top:50px;">
+<h1>Erreur : Informations client manquantes.</h1>
+<p>Vous serez redirigé dans 5 secondes...</p>
+<script>setTimeout(() => window.location.href = '/', 5000);</script>
+</body></html>
+HTML;
+    exit;
+}
+
+// Validación de email
+if (!filter_var($email_cliente, FILTER_VALIDATE_EMAIL)) {
+    echo <<<HTML
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Erreur Email</title></head>
+<body style="background-color:#fff; text-align:center; padding-top:50px;">
+<h1>Erreur : Adresse courriel invalide.</h1>
+<p>Vous serez redirigé dans 5 secondes...</p>
+<script>setTimeout(() => window.location.href = '/', 5000);</script>
+</body></html>
+HTML;
+    exit;
+}
+
+try {
+    if (!isset($conect) || !($conect instanceof PDO)) {
+        throw new Exception("Connexion à la base de données non disponible.");
+    }
+
+    $sql = "INSERT INTO clientes (usuario_cliente, pass_cliente, nombre_cliente, apellido_cliente, email_cliente, tel_cliente)
+            VALUES (:usuario_cliente, :pass_cliente, :nombre_cliente, :apellido_cliente, :email_cliente, :tel_cliente)";
     
-    $usuario_cliente = "DEFAULT";
-    $pass_cliente = "DEFAULT";
-    $nombre_cliente = $_POST['nombre_cliente'];
-    $apellido_cliente = $_POST['apellido_cliente'];
-    $email_cliente = $_POST['email_cliente'];
-    $tel_cliente = $_POST['tel_cliente'];
+    $stmt = $conect->prepare($sql);
 
-    $sql2 = "INSERT INTO clientes (usuario_cliente , pass_cliente , nombre_cliente , apellido_cliente , email_cliente , tel_cliente)
-    VALUES (:usuario_cliente, :pass_cliente ,:nombre_cliente , :apellido_cliente , :email_cliente , :tel_cliente)";
+    $stmt->bindParam(':usuario_cliente', $usuario_cliente);
+    $stmt->bindParam(':pass_cliente', $pass_cliente);
+    $stmt->bindParam(':nombre_cliente', $nombre_cliente);
+    $stmt->bindParam(':apellido_cliente', $apellido_cliente);
+    $stmt->bindParam(':email_cliente', $email_cliente);
+    $stmt->bindParam(':tel_cliente', $tel_cliente);
 
+    if ($stmt->execute()) {
+        echo <<<HTML
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Succès</title></head>
+<body style="background-color:#fff; text-align:center; padding-top:50px;">
+<h1>Inscription réussie !</h1>
+<p>Vous serez redirigé vers l'accueil dans 5 secondes.</p>
+<script>setTimeout(() => window.location.href = '/', 5000);</script>
+</body></html>
+HTML;
+    } else {
+        throw new Exception("Erreur SQL : " . implode(" | ", $stmt->errorInfo()));
+    }
 
-                        $crear_cliente = $conect->prepare($sql2);
-
-						$crear_cliente->bindParam(':usuario_cliente',$usuario_cliente);
-						$crear_cliente->bindParam(':pass_cliente',$pass_cliente);
-						$crear_cliente->bindParam(':nombre_cliente',$nombre_cliente);
-						$crear_cliente->bindParam(':apellido_cliente',$apellido_cliente);
-						$crear_cliente->bindParam(':email_cliente',$email_cliente);
-						$crear_cliente->bindParam(':tel_cliente',$tel_cliente);
-						$crear_cliente->execute();
-
-                        $success = 1;
-
-                        if($success == 1){
-                            echo "good";
-                        }
+} catch (Exception $e) {
+    error_log("Erreur d'inscription client : " . $e->getMessage());
+    echo <<<HTML
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Erreur</title></head>
+<body style="background-color:#fff; text-align:center; padding-top:50px;">
+<h1>Une erreur inattendue s'est produite.</h1>
+<p>Veuillez réessayer plus tard ou contacter le support.</p>
+<p>Vous serez redirigé dans 5 secondes...</p>
+<script>setTimeout(() => window.location.href = '/', 5000);</script>
+</body></html>
+HTML;
+}
 ?>
-
-
-</body>
-</html>

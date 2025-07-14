@@ -1,441 +1,80 @@
 <?php
 
-
-
 require_once "../administration/config/conexion.php";
 
+$opc = $_GET['opc'] ?? null;
 
+switch ($opc) {
+    case "check_email":
+    case "check_nombre":
+    case "check_apellido":
+    case "check_telefono":
+    case "check_id":
+        $email_cliente = $_POST['email_cliente'] ?? '';
+        $stmt = $conect->prepare("SELECT * FROM clientes WHERE email_cliente = :email");
+        $stmt->bindParam(':email', $email_cliente);
+        $stmt->execute();
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-
-
-$opc = $_GET['opc'];
-
-
-
-if ($opc=="check_email") {
-
-    
-
-     $email_cliente = $_POST['email_cliente'];
-
-
-
-     $comprobar_email = $conect->prepare("SELECT * FROM clientes WHERE email_cliente=:email_cliente"); 
-
-     $comprobar_email->bindParam(':email_cliente',$email_cliente);   
-
-     $comprobar_email->execute(); 
-
-    
-
-     if($comprobar_email->fetchColumn() > 0){
-
-        
-
-         
-
-    $detalles_email = $conect->prepare("SELECT * FROM clientes WHERE email_cliente=:email_cliente"); 
-
-    $detalles_email->bindParam(':email_cliente',$email_cliente);   
-
-    $detalles_email->execute();              
-
-    $data = $detalles_email->Fetch(PDO::FETCH_ASSOC);
-
-    $datos = $data['email_cliente'];
-
-    echo json_encode($datos);   
-
-
-
-    }else{
-
-
-
-        $datos = 1;
-
-        echo json_encode($datos);
-
+        if ($opc === "check_email") {
+            echo json_encode($data ? $data['email_cliente'] : 1);
+        } elseif ($data) {
+            $campo = match ($opc) {
+                "check_nombre"   => 'nombre_cliente',
+                "check_apellido" => 'apellido_cliente',
+                "check_telefono" => 'tel_cliente',
+                "check_id"       => 'id_cliente',
+            };
+            echo json_encode($data[$campo]);
+        } else {
+            echo json_encode(null);
         }
+        break;
 
+    case "get_holidays":
+        $stmt = $conect->query("SELECT fecha FROM parametros");
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        break;
 
+    case "get_exceptions":
+        $stmt = $conect->query("SELECT fecha FROM excepciones");
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        break;
 
+    case "validar_hora_ajax2":
+        $fecha = $_POST['fecha'] ?? '';
+        $stmt = $conect->prepare("SELECT hora, hora2, hora3, hora4, hora5, id_reserva FROM reservas WHERE fecha = :fecha");
+        $stmt->bindParam(":fecha", $fecha, PDO::PARAM_STR);
+        $stmt->execute();
+        echo json_encode($stmt->fetchAll());
+        break;
 
+    case "validar_hora_ajax":
+        $hora = $_POST['hora_reserva'] ?? '';
+        $fecha = $_POST['dates'] ?? '';
+        $start = "{$fecha}T{$hora}";
+        $stmt = $conect->prepare("SELECT * FROM reservas WHERE start = :start");
+        $stmt->bindParam(":start", $start);
+        $stmt->execute();
+        $disponible = $stmt->rowCount() === 0;
 
+        echo json_encode(
+            $disponible 
+            ? "L'heure sélectionnée est disponible." 
+            : "L'heure sélectionnée n'est pas disponible, veuillez réessayer une autre fois."
+        );
+        break;
 
+    case "validarDateForm":
+        $fecha = $_POST['fecha_consulta'] ?? '';
+        $stmt = $conect->prepare("SELECT hora, id_reserva FROM reservas WHERE fecha = :fecha");
+        $stmt->bindParam(":fecha", $fecha);
+        $stmt->execute();
+        echo json_encode($stmt->fetchAll());
+        break;
 
-
-
-
-
-    
-
-    
-
-
-
+    default:
+        http_response_code(400);
+        echo json_encode(['error' => 'Requête invalide.']);
+        break;
 }
-
-
-
-elseif ($opc=="check_nombre") {
-
-    $email_cliente = $_POST['email_cliente'];
-
-    $detalles_email =$conect->prepare("SELECT * FROM clientes WHERE email_cliente=:email_cliente");
-
-    $detalles_email->bindParam(':email_cliente',$email_cliente);
-
-    $detalles_email->execute();
-
-    $data = $detalles_email->Fetch(PDO::FETCH_ASSOC);
-
-    
-
-    $datos = $data['nombre_cliente'];
-
-    echo json_encode($datos);
-
-}
-
-
-
-
-
-
-
-
-
-elseif($opc == "get_holidays"){
-
-
-
-   
-
-    
-
-    
-
-    $get_holidays =$conect->prepare("SELECT fecha FROM parametros");
-
-    $get_holidays->execute();
-
-    $holidays = $get_holidays->FetchAll(PDO::FETCH_ASSOC);
-
-    
-
-    echo json_encode($holidays);
-
-}
-
-
-
-
-
-
-
-elseif($opc == "get_exceptions"){
-
-
-
-   
-
-    
-
-    
-
-    $get_exceptions =$conect->prepare("SELECT fecha FROM excepciones");
-
-    $get_exceptions->execute();
-
-    $exceptions = $get_exceptions->FetchAll(PDO::FETCH_ASSOC);
-
-    
-
-    echo json_encode($exceptions);
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-elseif ($opc=="check_apellido") {
-
-    $email_cliente = $_POST['email_cliente'];
-
-    
-
-    
-
-    $detalles_email =$conect->prepare("SELECT * FROM clientes WHERE email_cliente=:email_cliente");
-
-    $detalles_email->bindParam(':email_cliente',$email_cliente);
-
-    $detalles_email->execute();
-
-    $data = $detalles_email->Fetch(PDO::FETCH_ASSOC);
-
-    
-
-    $datos = $data['apellido_cliente'];
-
-    echo json_encode($datos);
-
-}
-
-
-
-
-
-
-
-
-
-elseif ($opc=="check_telefono") {
-
-    $email_cliente = $_POST['email_cliente'];
-
-    
-
-    
-
-    $detalles_email =$conect->prepare("SELECT * FROM clientes WHERE email_cliente=:email_cliente");
-
-    $detalles_email->bindParam(':email_cliente',$email_cliente);
-
-    $detalles_email->execute();
-
-    $data = $detalles_email->Fetch(PDO::FETCH_ASSOC);
-
-    
-
-    $datos = $data['tel_cliente'];
-
-    echo json_encode($datos);
-
-}
-
-
-
-
-
-
-
-
-
-elseif ($opc=="check_id") {
-
-    $email_cliente = $_POST['email_cliente'];
-
-    
-
-    
-
-    $detalles_email =$conect->prepare("SELECT * FROM clientes WHERE email_cliente=:email_cliente");
-
-    $detalles_email->bindParam(':email_cliente',$email_cliente);
-
-    $detalles_email->execute();
-
-    $data = $detalles_email->Fetch(PDO::FETCH_ASSOC);
-
-    
-
-    $datos = $data['id_cliente'];
-
-    echo json_encode($datos);
-
-}
-
-
-
-
-
-
-
-
-
-
-
-elseif($opc=="validar_hora_ajax2" ){
-
-    							
-
-$fecha = $_POST['fecha'];
-
-
-
-
-
-
-
-$validarHorasTabla = $conect->prepare("SELECT hora, hora2, hora3, hora4, hora5,  id_reserva FROM reservas WHERE fecha = :fecha");
-
-$validarHorasTabla->bindParam(":fecha" , $fecha , PDO::PARAM_STR);
-
-$validarHorasTabla->execute();
-
-$response = $validarHorasTabla->fetchAll();
-
-
-
-echo json_encode($response);
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-elseif($opc == "validar_hora_ajax" ){
-
-    							
-
-
-
-
-
-	$hora_reserva = $_POST['hora_reserva'];						
-
-    $start = $_POST['dates']."T".$hora_reserva;
-
-               
-
-    $sqlValidarHorario = $conect->prepare("SELECT * FROM reservas  WHERE start = :start ");
-
-    $sqlValidarHorario->bindParam(":start", $start, PDO::PARAM_STR);	
-
-    $sqlValidarHorario->execute();									
-
-    //$sqlValidarHorario->fetch();
-
-
-
-    $hola = $sqlValidarHorario->fetchAll();
-
-
-
-    if(count($hola) >  0 ){
-
-        
-
-        $error = "L'heure sélectionnée n'est pas disponible, veuillez réessayer une autre fois.";
-
-        echo json_encode($error);
-
-    }else{
-
-        $error = "L'heure sélectionnée est disponible.";
-
-        echo json_encode($error);
-
-    }
-
-}
-
-
-
-
-
-elseif($opc == "validarDateForm"){
-
-    $fecha_consulta = $_POST['fecha_consulta'];
-
-
-
-    $sqlValidarConsulta = $conect->prepare("SELECT hora, id_reserva FROM reservas WHERE fecha = :fecha_consulta ");
-
-    $sqlValidarConsulta->bindParam(":fecha_consulta" , $fecha_consulta);
-
-    $sqlValidarConsulta->execute();
-
-
-
-    $data = $sqlValidarConsulta->fetchAll();
-
-
-
-    echo json_encode($data);
-
-
-
-
-
-
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-?>
