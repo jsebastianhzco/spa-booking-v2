@@ -1,0 +1,14 @@
+#modal-update > div , #modal-create > div , #modal-changes > div{
+    max-width: 820px;
+}
+
+
+.usuario-lista:hover{
+ cursor: pointer;
+ background-color: aqua;
+}
+
+
+.view-pass{
+    cursor: pointer;
+}

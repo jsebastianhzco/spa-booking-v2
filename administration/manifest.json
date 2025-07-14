@@ -1,0 +1,16 @@
+{
+    "name": "Vista web Progressive Web App",
+    "short_name": "js13kPWA",
+    "description": "Progressive Web App Elianne.",
+    "icons": [
+      {
+        "src": "assets/images/fav.png",
+        "sizes": "32x32",
+        "type": "image/png"
+      }
+    ],
+    "start_url": "../administration/index.php",
+    "display": "fullscreen",
+    "theme_color": "#B12A34",
+    "background_color": "#B12A34"
+  }
